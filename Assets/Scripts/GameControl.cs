@@ -107,9 +107,23 @@ public class GameControl : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.A) && isTripleSelected)
         {
             tripleTurnLeft();
-        }else if (Input.GetKeyDown(KeyCode.D) && isTripleSelected)
+            /*
+            if (isNoMove())
+            {
+                gameOver = true;
+            }
+            */
+        }
+        else if (Input.GetKeyDown(KeyCode.D) && isTripleSelected)
         {
             tripleTurnRight();
+
+            /*
+            if (isNoMove())
+            {
+                gameOver = true;
+            }
+            */
         }
 
         if (Input.touchCount == 1)
@@ -435,6 +449,8 @@ public class GameControl : MonoBehaviour
                     destroySiblings(getSiblings(hexagons, index[0], j));
             }
         }
+
+
     }
 
     void turnRight()
@@ -486,6 +502,8 @@ public class GameControl : MonoBehaviour
         if (hexagons[tripleHex[4]][tripleHex[5]] != null)
             destroySiblings(getSiblings(hexagons, tripleHex[4], tripleHex[5]));
 
+
+
     }
 
     void turnLeft()
@@ -535,6 +553,7 @@ public class GameControl : MonoBehaviour
         if (hexagons[tripleHex[4]][tripleHex[5]] != null)
             destroySiblings(getSiblings(hexagons, tripleHex[4], tripleHex[5]));
 
+       
     }
 
     void updateColumn(int i)
@@ -607,11 +626,6 @@ public class GameControl : MonoBehaviour
             }
         }
 
-        /*
-        if (isNoMove())
-        {
-            gameOver = true;
-        }*/
 
     }
 
@@ -626,54 +640,86 @@ public class GameControl : MonoBehaviour
                 List<int[]> neighbors = getNeighbors(i, j);
                 List<int[]> friends = getFriends(neighbors, i, j);
 
-                foreach (int[] friend in friends)
-                {
-                    foreach (int[] neighbor in neighbors)
-                    {
-                        if (getNeighbors(friend[0], friend[1]).Contains<int[]>(neighbor))
-                        {
-                            if (!(neighbor[0] == i && neighbor[1] == j))
-                            {
-                                List<int[]> commanNeighborsNeighbors = getNeighbors(neighbor[0], neighbor[1]);
-                                foreach (int[] commanNeighborsNeighbor in commanNeighborsNeighbors)
-                                {
-                                    if (hexagons[commanNeighborsNeighbor[0]][commanNeighborsNeighbor[1]].transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial == hexagons[i][j].transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial)
-                                    {
-                                        return false;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
 
-                /*
+                //3. teşebbüs
                 foreach (int[] friend in friends)
                 {
-                    foreach (int[] neighbor in neighbors)
+                    List<int[]> friendsNeighbors = getNeighbors(friend[0], friend[1]);
+
+                    foreach (int[] friendsNeighbor in friendsNeighbors)
                     {
-                        List<int[]> friendsNeighbors = getNeighbors(friend[0], friend[1]);
-                        foreach (int[] friendsNeighbor in friendsNeighbors)
+                        if (neighbors.Contains(friendsNeighbor) && !(friendsNeighbor[0] == i && friendsNeighbor[1] == j))
                         {
-                            if (!(friendsNeighbor[0] == i && friendsNeighbor[1] == j))
+                            List<int[]> commonNeighbors = getNeighbors(friendsNeighbor[0], friendsNeighbor[1]); // 2 tane ortak komşu
+
+                            foreach (int[] commonNeighbor in commonNeighbors)
                             {
-                                if (friendsNeighbors.Contains<int[]>(neighbor))
+                                List<int[]> commonNeighborsNeighbors = getNeighbors(commonNeighbor[0], commonNeighbor[1]);
+                                foreach (int[] commonNeighborsNeighbor in commonNeighborsNeighbors)
                                 {
-                                    List<int[]> commonFriendsNeighbors = getNeighbors(neighbor[0], neighbor[1]);
-                                    foreach (int[] commonFriendsNeighbor in commonFriendsNeighbors)
+                                    if (!(commonNeighborsNeighbor[0] == i && commonNeighborsNeighbor[1] == j) && !(friend[0] == i && friend[1] == j))
                                     {
-                                        if(hexagons[commonFriendsNeighbor[0]][commonFriendsNeighbor[1]].transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial == hexagons[i][j].transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial)
+                                        if (hexagons[commonNeighborsNeighbor[0]][commonNeighborsNeighbor[1]].transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial == hexagons[i][j].transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial)
                                         {
                                             return false;
                                         }
                                     }
                                 }
+
                             }
                         }
                     }
-                }*/
+                }
+
+               /* 2. teşebbüs
+               foreach (int[] friend in friends)
+               {
+                   foreach (int[] neighbor in neighbors)
+                   {
+                       if (getNeighbors(friend[0], friend[1]).Contains<int[]>(neighbor))
+                       {
+                           if (!(neighbor[0] == i && neighbor[1] == j))
+                           {
+                               List<int[]> commanNeighborsNeighbors = getNeighbors(neighbor[0], neighbor[1]);
+                               foreach (int[] commanNeighborsNeighbor in commanNeighborsNeighbors)
+                               {
+                                   if (hexagons[commanNeighborsNeighbor[0]][commanNeighborsNeighbor[1]].transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial == hexagons[i][j].transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial)
+                                   {
+                                       return false;
+                                   }
+                               }
+                           }
+                       }
+                   }
+               }
+
+               1. teşebbüs
+               foreach (int[] friend in friends)
+               {
+                   foreach (int[] neighbor in neighbors)
+                   {
+                       List<int[]> friendsNeighbors = getNeighbors(friend[0], friend[1]);
+                       foreach (int[] friendsNeighbor in friendsNeighbors)
+                       {
+                           if (!(friendsNeighbor[0] == i && friendsNeighbor[1] == j))
+                           {
+                               if (friendsNeighbors.Contains<int[]>(neighbor))
+                               {
+                                   List<int[]> commonFriendsNeighbors = getNeighbors(neighbor[0], neighbor[1]);
+                                   foreach (int[] commonFriendsNeighbor in commonFriendsNeighbors)
+                                   {
+                                       if(hexagons[commonFriendsNeighbor[0]][commonFriendsNeighbor[1]].transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial == hexagons[i][j].transform.GetChild(0).GetComponent<MeshRenderer>().sharedMaterial)
+                                       {
+                                           return false;
+                                       }
+                                   }
+                               }
+                           }
+                       }
+                   }
+               }*/
+                }
             }
-        }
                 return true;
     }
     //Author -> Harun Akdoğan 09.2020
